@@ -66,6 +66,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { io } from 'socket.io-client'
+import { API_BASE_URL } from './config.js'
 
 const fundingRates = ref([])
 const sortKey = ref('symbol')
@@ -108,7 +109,7 @@ async function confirmThreshold() {
 
 async function updateThreshold() {
   try {
-    const response = await fetch('http://localhost:5000/api/filter_threshold', {
+    const response = await fetch(`${API_BASE_URL}/api/filter_threshold`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -145,7 +146,7 @@ async function refreshData() {
 
 async function fetchCurrentThreshold() {
   try {
-    const response = await fetch('http://localhost:5000/api/filter_threshold')
+    const response = await fetch(`${API_BASE_URL}/api/filter_threshold`)
     const result = await response.json()
     filterThreshold.value = result.threshold
     tempThreshold.value = result.threshold
@@ -182,7 +183,7 @@ const sortedRates = computed(() => {
 })
 
 async function fetchInitialData() {
-  const res = await fetch('http://localhost:5000/api/funding_rates')
+  const res = await fetch(`${API_BASE_URL}/api/funding_rates`)
   const data = await res.json()
   fundingRates.value = data
   // 初次加載時設置時間
@@ -195,7 +196,7 @@ onMounted(() => {
   fetchInitialData()
   fetchCurrentThreshold()
   
-  socket = io('http://localhost:5000')
+  socket = io(API_BASE_URL)
   
   // 處理資金費率更新
   socket.on('funding_rate_update', (update) => {
